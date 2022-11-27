@@ -53,6 +53,26 @@ async def fetch_rank(
     return current_rank
 
 
+async def fetch_c_rank(
+    user_id: int,
+    mode: int,
+    country: str,
+) -> int:
+
+    (redis_key, mode_name) = redis_map[mode]
+    current_rank = await redis.zrevrank(
+        f"ripple:{redis_key}:{mode_name}:{country.lower()}",
+        user_id,
+    )
+
+    if current_rank is None:
+        current_rank = 0
+    else:
+        current_rank += 1
+
+    return current_rank
+
+
 async def fetch_pp(
     user_id: int,
     mode: int,
@@ -88,14 +108,17 @@ async def gather_profile_history(user: Mapping[str, Any]) -> None:
         inactive_days = (start_time - latest_pp_awarded) / 60 / 60 / 24
 
         if inactive_days > 60 or not privileges & 1:
-            user_rank = await db.fetch_val(
-                "SELECT `rank` FROM `user_profile_history` WHERE `user_id` = :user_id AND `mode` = :mode ORDER BY `captured_at` DESC LIMIT 1",
+            ranks = await db.fetch_one(
+                "SELECT `rank`, `country_rank`  FROM `user_profile_history` WHERE `user_id` = :user_id AND `mode` = :mode ORDER BY `captured_at` DESC LIMIT 1",
                 {"user_id": user_id, "mode": mode},
             )
-            if not user_rank:
+            if not ranks:
                 continue
+            user_rank = ranks["rank"]
+            country_rank = ranks["country_rank"]
         else:
             user_rank = await fetch_rank(user_id, mode)
+            country_rank = await fetch_c_rank(user_id, mode, user["country"])
 
         pp_val = await fetch_pp(user_id, mode)
         captured_at = datetime.datetime.now()
@@ -104,12 +127,13 @@ async def gather_profile_history(user: Mapping[str, Any]) -> None:
             continue
 
         await db.execute(
-            "INSERT INTO `user_profile_history` (`user_id`, `mode`, `pp`, `rank`, `captured_at`) VALUES (:user_id, :mode, :pp, :rank, :captured_at)",
+            "INSERT INTO `user_profile_history` (`user_id`, `mode`, `pp`, `rank`, `country_rank`, `captured_at`) VALUES (:user_id, :mode, :pp, :rank, :c_rank, :captured_at)",
             {
                 "user_id": user_id,
                 "mode": mode,
                 "pp": pp_val,
                 "rank": user_rank,
+                "c_rank": country_rank,
                 "captured_at": captured_at,
             },
         )
@@ -139,7 +163,9 @@ async def async_main() -> int:
     )
     await db.connect()
 
-    users = await db.fetch_all("SELECT id, privileges FROM users")
+    users = await db.fetch_all(
+        "SELECT u.id, u.privileges, s.country FROM users u INNER JOIN users_stats s ON u.id = s.id",
+    )
     async with db.write_database.transaction():
         await asyncio.gather(*[gather_profile_history(user) for user in users])
 

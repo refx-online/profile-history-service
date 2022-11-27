@@ -20,7 +20,7 @@ mode_map = {
 class UsersRepo:
 
     READ_PARAMS = """\
-        `u`.`privileges`, `s`.`latest_pp_awarded_{}` AS `latest_pp_awarded`
+        `u`.`privileges`, `st`.`country`, `s`.`latest_pp_awarded_{}` AS `latest_pp_awarded`
     """
 
     def __init__(self, ctx: Context) -> None:
@@ -37,7 +37,7 @@ class UsersRepo:
 
         query = f"""\
             SELECT {read_params}
-              FROM `users` `u` INNER JOIN `{db_table}` `s` ON `u`.`id` = `s`.`id`
+              FROM `users` `u` INNER JOIN `{db_table}` `s` INNER JOIN `users_stats` `st` ON `st`.`id` = `s`.`id` ON `u`.`id` = `s`.`id`
              WHERE `u`.`id` = :user_id LIMIT 1
         """
         params = {
