@@ -25,13 +25,13 @@ class PPHistory(BaseModel):
 
 class PPCapture(BaseModel):
     captured_at: datetime.datetime
-    value: int
+    pp: int
 
     @classmethod
     def from_mapping(cls, mapping: Mapping[str, Any]) -> PPCapture:
         return cls(
             captured_at=mapping["captured_at"],
-            value=mapping["pp"],
+            pp=mapping["pp"],
         )
 
 

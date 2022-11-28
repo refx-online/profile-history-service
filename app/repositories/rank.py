@@ -9,7 +9,7 @@ from app.common.context import Context
 class RanksRepo:
 
     READ_PARAMS = """\
-        `user_id`, `mode`, `captured_at`, `rank`
+        `user_id`, `mode`, `captured_at`, `rank`, `country_rank` AS `c_rank`
     """
 
     def __init__(self, ctx: Context) -> None:
@@ -25,7 +25,7 @@ class RanksRepo:
         query = f"""\
             SELECT {self.READ_PARAMS}
               FROM `user_profile_history`
-             WHERE `user_id` = :user_id AND `mode` = :mode ORDER BY `captured_at` DESC LIMIT :limit
+             WHERE `user_id` = :user_id AND `mode` = :mode ORDER BY `captured_at` ASC LIMIT :limit
         """
         params = {
             "user_id": user_id,

@@ -166,8 +166,7 @@ async def async_main() -> int:
     users = await db.fetch_all(
         "SELECT u.id, u.privileges, s.country FROM users u INNER JOIN users_stats s ON u.id = s.id",
     )
-    async with db.write_database.transaction():
-        await asyncio.gather(*[gather_profile_history(user) for user in users])
+    await asyncio.gather(*[gather_profile_history(user) for user in users])
 
     await db.disconnect()
     return 0
