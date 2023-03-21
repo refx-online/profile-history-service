@@ -19,13 +19,13 @@ class PPRepo:
         self,
         user_id: int,
         mode: int,
-        limit: int = 90,
+        limit: int = 89,
     ) -> list[Mapping[str, Any]]:
 
         query = f"""\
             SELECT {self.READ_PARAMS}
               FROM `user_profile_history`
-             WHERE `user_id` = :user_id AND `mode` = :mode ORDER BY `captured_at` ASC LIMIT :limit
+             WHERE `user_id` = :user_id AND `mode` = :mode ORDER BY `captured_at` DESC LIMIT :limit
         """
         params = {
             "user_id": user_id,

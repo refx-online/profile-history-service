@@ -28,6 +28,8 @@ async def fetch_many(
     r_repo = RanksRepo(ctx)
     resp = await r_repo.fetch_many(user_id, mode, limit)
 
+    resp = resp[::-1]  # swap it so its in right order.
+
     data_structure = {
         "user_id": user_id,
         "mode": mode,
