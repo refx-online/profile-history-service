@@ -4,7 +4,6 @@ from typing import Any
 from typing import Generic
 from typing import Literal
 from typing import TypeVar
-from typing import Union
 
 from pydantic.generics import GenericModel
 
@@ -22,7 +21,7 @@ class Success(GenericModel, Generic[T]):
 def success(
     content: Any,
     status_code: int = 200,
-    headers: Union[dict, None] = None,
+    headers: dict | None = None,
 ) -> json.ORJSONResponse:
     data = {"status": "success", "data": content}
     return json.ORJSONResponse(data, status_code, headers)
@@ -38,7 +37,7 @@ def failure(
     error: ServiceError,
     message: str,
     status_code: int = 400,
-    headers: Union[dict, None] = None,
+    headers: dict | None = None,
 ) -> json.ORJSONResponse:
     data = {"status": "error", "error": error, "message": message}
     return json.ORJSONResponse(data, status_code, headers)

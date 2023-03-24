@@ -35,6 +35,20 @@ class RankCapture(BaseModel):
             country=mapping["c_rank"],
         )
 
+class RankPeak(BaseModel):
+    user_id: int
+    mode: int
+    captured_at: datetime.datetime
+    rank: int
+
+    @classmethod
+    def from_mapping(cls, mapping: Mapping[str, Any]) -> RankPeak:
+        return cls(
+            user_id=mapping["user_id"],
+            mode=mapping["mode"],
+            captured_at=mapping["captured_at"],
+            rank=mapping["rank"],
+        )
 
 # Stupid hack.
 RankHistory.update_forward_refs()

@@ -9,3 +9,4 @@ class ServiceError(str, Enum):
     USERS_IS_NOT_ACTIVE = "users.is_not_active"
     RANKS_NOT_FOUND = "ranks.not_found"
     PP_NOT_FOUND = "pp.not_found"
+    PEAK_RANK_NOT_FOUND = "peak_rank.not_found"

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import datetime
+from app.common.errors import ServiceError
 
 from app.common.context import Context
+from app.models.rank import RankPeak
 from app.models.rank import RankCapture
 from app.models.rank import RankHistory
 from app.repositories.rank import RanksRepo
@@ -17,6 +19,26 @@ mode_map = {
     6: ("relaxboard", "ctb"),
     7: ("autoboard", "std"),
 }
+
+async def fetch_peak(
+    ctx: Context,
+    user_id: int,
+    mode: int,
+) -> RankPeak | ServiceError:
+    
+    r_repo = RanksRepo(ctx)
+    resp = await r_repo.fetch_peak(user_id, mode)
+
+    if resp is None:
+        return ServiceError.PEAK_RANK_NOT_FOUND
+
+    data_structure = {
+        "user_id": user_id,
+        "mode": mode,
+        "captured_at": resp["captured_at"],
+        "rank": resp["rank"],
+    }
+    return RankPeak.from_mapping(data_structure)
 
 
 async def fetch_many(
