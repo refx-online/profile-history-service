@@ -85,3 +85,24 @@ async def fetch_current(
     }
 
     return RankCapture.from_mapping(data_structure)
+
+async def fetch_current_rank(
+    ctx: Context,
+    user_id: int,
+    mode: int,
+) -> RankPeak | None:
+
+    (redis_key, mode_name) = mode_map[mode]
+    current_rank = await ctx.redis.zrevrank(f"ripple:{redis_key}:{mode_name}", user_id)
+    if current_rank is None:
+        return None
+
+    current_rank_captured_at = datetime.datetime.now()
+    data_structure = {
+        "user_id": user_id,
+        "mode": mode,
+        "captured_at": current_rank_captured_at,
+        "rank": current_rank + 1,  # 0-indexed.
+    }
+
+    return RankPeak.from_mapping(data_structure)

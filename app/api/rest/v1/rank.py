@@ -101,4 +101,21 @@ async def get_profile_peak_rank(
             status_code=200,
         )
 
+    # get current rank to create in real time rank peak.
+    current_rank_data = await rank.fetch_current_rank(
+        ctx,
+        user_id,
+        mode,
+    )
+
+    if not current_rank_data:
+        return responses.failure(
+            ServiceError.RANKS_NOT_FOUND,
+            "Failed to fetch newest rank data.",
+            status_code=200,
+        )
+
+    if current_rank_data.rank < data.rank:
+        data = current_rank_data
+
     return responses.success(data)
