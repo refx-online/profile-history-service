@@ -6,6 +6,7 @@ httpx
 orjson
 pre-commit
 python-dotenv
+python-json-logger
 python-multipart
 structlog
 uvicorn
