@@ -2,11 +2,11 @@ aioredis
 databases[asyncmy]
 ddtrace
 fastapi[all]
-git+https://github.com/akatsuki-v2/shared-modules
 httpx
 orjson
 pre-commit
 python-dotenv
+python-json-logger
 python-multipart
 structlog
 uvicorn
