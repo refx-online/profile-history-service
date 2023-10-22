@@ -35,6 +35,7 @@ class RankCapture(BaseModel):
             country=mapping["c_rank"],
         )
 
+
 class RankPeak(BaseModel):
     user_id: int
     mode: int
@@ -49,6 +50,7 @@ class RankPeak(BaseModel):
             captured_at=mapping["captured_at"],
             rank=mapping["rank"],
         )
+
 
 # Stupid hack.
 RankHistory.update_forward_refs()

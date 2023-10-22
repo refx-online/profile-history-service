@@ -64,6 +64,7 @@ async def get_profile_rank_history(
     data.captures.append(current_rank_capture)
     return responses.success(data)
 
+
 @router.get("/peak-rank", response_model=Success[RankPeak])
 async def get_profile_peak_rank(
     user_id: int,

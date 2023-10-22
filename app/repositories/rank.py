@@ -24,7 +24,7 @@ class RanksRepo:
         user_id: int,
         mode: int,
     ) -> Mapping[str, Any] | None:
-        
+
         query = f"""\
             SELECT {self.READ_PEAK_PARAMS} FROM `user_profile_history`
                 WHERE `user_id` = :user_id AND `mode` = :mode AND `rank` > 0

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import datetime
-from app.common.errors import ServiceError
 
 from app.common.context import Context
-from app.models.rank import RankPeak
+from app.common.errors import ServiceError
 from app.models.rank import RankCapture
 from app.models.rank import RankHistory
+from app.models.rank import RankPeak
 from app.repositories.rank import RanksRepo
 
 mode_map = {
@@ -20,12 +20,13 @@ mode_map = {
     7: ("autoboard", "std"),
 }
 
+
 async def fetch_peak(
     ctx: Context,
     user_id: int,
     mode: int,
 ) -> RankPeak | ServiceError:
-    
+
     r_repo = RanksRepo(ctx)
     resp = await r_repo.fetch_peak(user_id, mode)
 
@@ -85,6 +86,7 @@ async def fetch_current(
     }
 
     return RankCapture.from_mapping(data_structure)
+
 
 async def fetch_current_rank(
     ctx: Context,
