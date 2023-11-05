@@ -50,6 +50,9 @@ def init_redis(api: FastAPI) -> None:
         service_redis = redis.ServiceRedis(
             host=settings.REDIS_HOST,
             port=settings.REDIS_PORT,
+            password=settings.REDIS_PASS,
+            ssl=settings.REDIS_USE_SSL,
+            username=settings.REDIS_USER,
         )
         await service_redis.initialize()
         api.state.redis = service_redis

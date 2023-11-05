@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import logging
-
 import uvicorn
 
 from app.common import settings
