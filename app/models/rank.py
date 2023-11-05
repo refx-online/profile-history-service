@@ -53,4 +53,4 @@ class RankPeak(BaseModel):
 
 
 # Stupid hack.
-RankHistory.update_forward_refs()
+RankHistory.model_rebuild()

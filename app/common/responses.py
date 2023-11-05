@@ -5,7 +5,7 @@ from typing import Generic
 from typing import Literal
 from typing import TypeVar
 
-from pydantic.generics import GenericModel
+from pydantic import BaseModel
 
 from app.common import json
 from app.common.errors import ServiceError
@@ -13,7 +13,7 @@ from app.common.errors import ServiceError
 T = TypeVar("T")
 
 
-class Success(GenericModel, Generic[T]):
+class Success(BaseModel, Generic[T]):
     status: Literal["success"]
     data: T
 
@@ -27,9 +27,9 @@ def success(
     return json.ORJSONResponse(data, status_code, headers)
 
 
-class ErrorResponse(GenericModel, Generic[T]):
+class ErrorResponse(BaseModel):
     status: Literal["error"]
-    error: T
+    error: ServiceError
     message: str
 
 

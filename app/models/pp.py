@@ -36,4 +36,4 @@ class PPCapture(BaseModel):
 
 
 # Stupid hack.
-PPHistory.update_forward_refs()
+PPHistory.model_rebuild()
