@@ -26,7 +26,6 @@ async def fetch_peak(
     user_id: int,
     mode: int,
 ) -> RankPeak | ServiceError:
-
     r_repo = RanksRepo(ctx)
     resp = await r_repo.fetch_peak(user_id, mode)
 
@@ -67,7 +66,6 @@ async def fetch_current(
     mode: int,
     country: str,
 ) -> RankCapture | None:
-
     (redis_key, mode_name) = mode_map[mode]
     current_rank = await ctx.redis.zrevrank(f"ripple:{redis_key}:{mode_name}", user_id)
     current_c_rank = await ctx.redis.zrevrank(
@@ -93,7 +91,6 @@ async def fetch_current_rank(
     user_id: int,
     mode: int,
 ) -> RankPeak | None:
-
     (redis_key, mode_name) = mode_map[mode]
     current_rank = await ctx.redis.zrevrank(f"ripple:{redis_key}:{mode_name}", user_id)
     if current_rank is None:

@@ -14,7 +14,6 @@ class RankHistory(BaseModel):
 
     @classmethod
     def from_mapping(cls, mapping: Mapping[str, Any]) -> RankHistory:
-
         return cls(
             user_id=mapping["user_id"],
             mode=mapping["mode"],

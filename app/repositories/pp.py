@@ -7,7 +7,6 @@ from app.common.context import Context
 
 
 class PPRepo:
-
     READ_PARAMS = """\
         `user_id`, `mode`, `captured_at`, `pp`
     """
@@ -21,7 +20,6 @@ class PPRepo:
         mode: int,
         limit: int = 89,
     ) -> list[Mapping[str, Any]]:
-
         query = f"""\
             SELECT {self.READ_PARAMS}
               FROM `user_profile_history`

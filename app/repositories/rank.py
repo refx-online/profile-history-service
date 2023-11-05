@@ -7,7 +7,6 @@ from app.common.context import Context
 
 
 class RanksRepo:
-
     READ_PARAMS = """\
         `user_id`, `mode`, `captured_at`, `rank`, `country_rank` AS `c_rank`
     """
@@ -24,7 +23,6 @@ class RanksRepo:
         user_id: int,
         mode: int,
     ) -> Mapping[str, Any] | None:
-
         query = f"""\
             SELECT {self.READ_PEAK_PARAMS} FROM `user_profile_history`
                 WHERE `user_id` = :user_id AND `mode` = :mode AND `rank` > 0
@@ -42,7 +40,6 @@ class RanksRepo:
         mode: int,
         limit: int = 89,  # one will be added in api.
     ) -> list[Mapping[str, Any]]:
-
         query = f"""\
             SELECT {self.READ_PARAMS}
               FROM `user_profile_history`

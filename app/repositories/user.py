@@ -18,7 +18,6 @@ mode_map = {
 
 
 class UsersRepo:
-
     READ_PARAMS = """\
         `u`.`privileges`, `st`.`country`, `s`.`latest_pp_awarded_{}` AS `latest_pp_awarded`
     """
@@ -31,7 +30,6 @@ class UsersRepo:
         user_id: int,
         mode: int,
     ) -> Mapping[str, Any] | None:
-
         (db_table, mode_name) = mode_map[mode]
         read_params = self.READ_PARAMS.format(mode_name)
 
