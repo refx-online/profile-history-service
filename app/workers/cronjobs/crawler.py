@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.10
 # To run it you need to:
-# `cd path/to/profile-history-service && python -m app.workers.daemons.crawler`
+# `cd path/to/profile-history-service && python -m app.workers.cronjobs.crawler`
 from __future__ import annotations
 
 import asyncio

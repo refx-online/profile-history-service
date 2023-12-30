@@ -1,0 +1,26 @@
+apps:
+  - name: profile-history-service-api
+    environment: production
+    codebase: profile-history-service
+    replicaCount: 1
+    container:
+      image:
+        repository: osuakatsuki/profile-history-service
+        tag: latest
+      port: 80
+      resources:
+        limits:
+          cpu: 300m
+          memory: 250Mi
+        requests:
+          cpu: 150m
+          memory: 150Mi
+      env:
+        - name: APP_COMPONENT
+          value: api
+      imagePullSecrets:
+        - name: osuakatsuki-registry-secret
+        # - name: registry-akatsuki
+    service:
+      type: ClusterIP
+      port: 80

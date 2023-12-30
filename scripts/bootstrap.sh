@@ -14,15 +14,9 @@ if [ -z "$APP_COMPONENT" ]; then
 fi
 
 if [[ $PULL_SECRETS_FROM_VAULT -eq 1 ]]; then
-  echo "Installing akatsuki-cli"
-  pip install --index-url $PYPI_INDEX_URL akatsuki-cli
-  echo "Installed akatsuki-cli"
-
-  echo "Fetching secrets from vault"
-  akatsuki vault get profile-history-service $APP_ENV -o .env
-  echo "Fetched secrets from vault"
+  # TODO: revert to $APP_ENV
+  akatsuki vault get profile-history-service production-k8s -o .env
   source .env
-  echo "Sourced secrets from vault"
 fi
 
 # await database availability
@@ -33,7 +27,9 @@ fi
 /scripts/await-service.sh $REDIS_HOST $REDIS_PORT $SERVICE_READINESS_TIMEOUT
 
 if [[ $APP_COMPONENT == "api" ]]; then
-    exec /scripts/run-api.sh
+  exec /scripts/run-api.sh
+elif [[ $APP_COMPONENT == "crawler-cronjob" ]]; then
+  exec /scripts/run-crawler-cronjob.sh
 else
   echo "Unknown APP_COMPONENT: $APP_COMPONENT"
   exit 1
