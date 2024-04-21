@@ -17,7 +17,7 @@ mode_map = {
     4: ("relaxboard", "std"),
     5: ("relaxboard", "taiko"),
     6: ("relaxboard", "ctb"),
-    7: ("autoboard", "std"),
+    8: ("autoboard", "std"),
 }
 
 

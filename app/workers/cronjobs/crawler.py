@@ -22,7 +22,7 @@ redis_map = {
     4: ("relaxboard", "std"),
     5: ("relaxboard", "taiko"),
     6: ("relaxboard", "ctb"),
-    7: ("autoboard", "std"),
+    8: ("autoboard", "std"),
 }
 
 db_map = {
@@ -33,7 +33,7 @@ db_map = {
     4: ("rx_stats", "std"),
     5: ("rx_stats", "taiko"),
     6: ("rx_stats", "ctb"),
-    7: ("ap_stats", "std"),
+    8: ("ap_stats", "std"),
 }
 
 
@@ -97,7 +97,7 @@ async def gather_profile_history(user: Mapping[str, Any]) -> None:
 
     start_time = int(time.time())
 
-    for mode in range(8):
+    for mode in [0, 1, 2, 3, 4, 5, 6, 8]:
         (db_table, mode_name) = db_map[mode]
         latest_pp_awarded = await db.fetch_val(
             f"SELECT latest_pp_awarded_{mode_name} FROM {db_table} WHERE id = :user_id",

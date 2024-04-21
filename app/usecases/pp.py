@@ -15,7 +15,7 @@ mode_map = {
     4: ("rx_stats", "std"),
     5: ("rx_stats", "taiko"),
     6: ("rx_stats", "ctb"),
-    7: ("ap_stats", "std"),
+    8: ("ap_stats", "std"),
 }
 
 
