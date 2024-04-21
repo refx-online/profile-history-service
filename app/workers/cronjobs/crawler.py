@@ -25,17 +25,6 @@ redis_map = {
     8: ("autoboard", "std"),
 }
 
-db_map = {
-    0: ("users_stats", "std"),
-    1: ("users_stats", "taiko"),
-    2: ("users_stats", "ctb"),
-    3: ("users_stats", "mania"),
-    4: ("rx_stats", "std"),
-    5: ("rx_stats", "taiko"),
-    6: ("rx_stats", "ctb"),
-    8: ("ap_stats", "std"),
-}
-
 
 async def fetch_rank(
     user_id: int,
@@ -75,13 +64,17 @@ async def fetch_pp(
     user_id: int,
     mode: int,
 ) -> int:
-    (db_table, mode_name) = db_map[mode]
-
     params = {
         "user_id": user_id,
+        "mode": mode,
     }
     current_pp = await db.fetch_val(
-        f"SELECT pp_{mode_name} AS pp FROM {db_table} WHERE id = :user_id",
+        """
+        SELECT `pp`
+        FROM `user_stats`
+        WHERE `user_id` = :user_id
+        AND `mode` = :mode
+        """,
         params,
     )
 
@@ -97,17 +90,27 @@ async def gather_profile_history(user: Mapping[str, Any]) -> None:
 
     start_time = int(time.time())
 
-    for mode in [0, 1, 2, 3, 4, 5, 6, 8]:
-        (db_table, mode_name) = db_map[mode]
+    for mode in (0, 1, 2, 3, 4, 5, 6, 8):
         latest_pp_awarded = await db.fetch_val(
-            f"SELECT latest_pp_awarded_{mode_name} FROM {db_table} WHERE id = :user_id",
-            {"user_id": user_id},
+            """
+            SELECT `latest_pp_awarded`
+            FROM `user_stats`
+            WHERE `user_id` = :user_id
+            AND `mode` = :mode
+            """,
+            {"user_id": user_id, "mode": mode},
         )
         inactive_days = (start_time - latest_pp_awarded) / 60 / 60 / 24
 
         if inactive_days > 60 or not privileges & 1:
             ranks = await db.fetch_one(
-                "SELECT `rank`, `country_rank`  FROM `user_profile_history` WHERE `user_id` = :user_id AND `mode` = :mode ORDER BY `captured_at` DESC LIMIT 1",
+                """
+                SELECT `rank`, `country_rank`
+                FROM `user_profile_history`
+                WHERE `user_id` = :user_id
+                AND `mode` = :mode
+                ORDER BY `captured_at` DESC
+                """,
                 {"user_id": user_id, "mode": mode},
             )
             if not ranks:
@@ -125,7 +128,11 @@ async def gather_profile_history(user: Mapping[str, Any]) -> None:
             continue
 
         await db.execute(
-            "INSERT INTO `user_profile_history` (`user_id`, `mode`, `pp`, `rank`, `country_rank`, `captured_at`) VALUES (:user_id, :mode, :pp, :rank, :c_rank, :captured_at)",
+            """
+            INSERT INTO `user_profile_history`
+            (`user_id`, `mode`, `pp`, `rank`, `country_rank`, `captured_at`)
+            VALUES (:user_id, :mode, :pp, :rank, :c_rank, :captured_at)
+            """,
             {
                 "user_id": user_id,
                 "mode": mode,
@@ -162,7 +169,10 @@ async def async_main() -> int:
     await db.connect()
 
     users = await db.fetch_all(
-        "SELECT u.id, u.privileges, s.country FROM users u INNER JOIN users_stats s ON u.id = s.id",
+        """
+        SELECT `id`, `privileges`, `country`
+        FROM `users`
+        """,
     )
     await asyncio.gather(*[gather_profile_history(user) for user in users])
 
