@@ -8,7 +8,7 @@ from app.common.context import Context
 
 class UsersRepo:
     READ_PARAMS = """\
-        `u`.`privileges`, `u.`.`country`, `s`.`latest_pp_awarded`
+        `u`.`privileges`, `u`.`country`, `s`.`latest_pp_awarded`
     """
 
     def __init__(self, ctx: Context) -> None:
