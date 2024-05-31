@@ -1,5 +1,4 @@
 from aioredis import StrictRedis
 
 
-class ServiceRedis(StrictRedis):
-    ...
+class ServiceRedis(StrictRedis): ...
