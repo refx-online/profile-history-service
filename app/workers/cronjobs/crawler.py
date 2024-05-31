@@ -6,13 +6,19 @@ from __future__ import annotations
 import asyncio
 import datetime
 import time
-from collections.abc import Mapping
-from typing import Any
+from typing import TypedDict
 
 import aioredis
 
 from app.common import settings
 from app.services import database
+
+
+class PartialUser(TypedDict):
+    id: int
+    privileges: int
+    country: str
+
 
 redis_map = {
     0: ("leaderboard", "std"),
@@ -84,7 +90,7 @@ async def fetch_pp(
     return current_pp
 
 
-async def gather_profile_history(user: Mapping[str, Any]) -> None:
+async def gather_profile_history(user: PartialUser) -> None:
     user_id = user["id"]
     privileges = user["privileges"]
 
@@ -174,7 +180,14 @@ async def async_main() -> int:
         FROM `users`
         """,
     )
-    await asyncio.gather(*[gather_profile_history(user) for user in users])
+    for user in users:
+        await gather_profile_history(
+            {
+                "id": user["id"],
+                "privileges": user["privileges"],
+                "country": user["country"],
+            },
+        )
 
     await db.disconnect()
     return 0
