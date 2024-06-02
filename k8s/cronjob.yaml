@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: profile-history-service-cron-production
+spec:
+  schedule: "0 22 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: profile-history-service-cron-production
+            image: osuakatsuki/profile-history-service:latest
+            imagePullPolicy: Always
+            command:
+              - ./scripts/bootstrap.sh
+            env:
+              - name: KUBERNETES
+                value: 'true'
+              - name: PULL_SECRETS_FROM_VAULT
+                value: '1'
+              - name: VAULT_ADDR
+                valueFrom:
+                  secretKeyRef:
+                    name: vault
+                    key: address
+              - name: VAULT_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: vault
+                    key: token
+              - name: APP_ENV
+                value: production # TODO
+              - name: APP_COMPONENT
+                value: crawler-cronjob
+          restartPolicy: OnFailure
+          imagePullSecrets:
+            - name: osuakatsuki-registry-secret

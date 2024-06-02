@@ -87,3 +87,7 @@ jobs:
             --values chart/values.yaml \
             profile-history-service-production \
             common-helm-charts/microservice-base/
+
+      - name: Deploy cronjob to production cluster
+        run: |
+          kubectl apply -f k8s/cronjob.yaml
