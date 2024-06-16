@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import Any
 
 from app.common.context import Context
@@ -18,7 +17,7 @@ class UsersRepo:
         self,
         user_id: int,
         mode: int,
-    ) -> Mapping[str, Any] | None:
+    ) -> dict[str, Any] | None:
         query = f"""\
             SELECT {self.READ_PARAMS}
               FROM `users` `u` INNER JOIN `user_stats` `s` ON `u`.`id` = `s`.`user_id`

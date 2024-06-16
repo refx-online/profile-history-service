@@ -10,7 +10,7 @@ from pydantic import BaseModel
 class PPHistory(BaseModel):
     user_id: int
     mode: int
-    captures: list
+    captures: list[PPCapture]
 
     @classmethod
     def from_mapping(cls, mapping: Mapping[str, Any]) -> PPHistory:

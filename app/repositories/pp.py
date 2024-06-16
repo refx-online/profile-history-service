@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import Any
 
 from app.common.context import Context
@@ -19,7 +18,7 @@ class PPRepo:
         user_id: int,
         mode: int,
         limit: int = 89,
-    ) -> list[Mapping[str, Any]]:
+    ) -> list[dict[str, Any]]:
         query = f"""\
             SELECT {self.READ_PARAMS}
               FROM `user_profile_history`

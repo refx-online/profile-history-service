@@ -11,8 +11,8 @@ class RequestContext(Context):
 
     @property
     def db(self) -> database.Database:
-        return self.request.state.db
+        return self.request.state.db  # type: ignore[no-any-return]
 
     @property
     def redis(self) -> redis.ServiceRedis:
-        return self.request.state.redis
+        return self.request.state.redis  # type: ignore[no-any-return]

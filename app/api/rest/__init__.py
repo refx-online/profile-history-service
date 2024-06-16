@@ -5,6 +5,8 @@ import time
 
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi import Response
+from starlette.middleware.base import RequestResponseEndpoint
 
 from app.common import settings
 from app.services import database
@@ -54,7 +56,7 @@ def init_redis(api: FastAPI) -> None:
             ssl=settings.REDIS_USE_SSL,
             username=settings.REDIS_USER,
         )
-        await service_redis.initialize()
+        await service_redis.initialize()  # type: ignore[unused-awaitable]
         api.state.redis = service_redis
         logging.info("Redis pool started up")
 
@@ -68,19 +70,28 @@ def init_redis(api: FastAPI) -> None:
 
 def init_middlewares(api: FastAPI) -> None:
     @api.middleware("http")
-    async def add_db_to_request(request: Request, call_next):
+    async def add_db_to_request(
+        request: Request,
+        call_next: RequestResponseEndpoint,
+    ) -> Response:
         request.state.db = request.app.state.db
         response = await call_next(request)
         return response
 
     @api.middleware("http")
-    async def add_redis_to_request(request: Request, call_next):
+    async def add_redis_to_request(
+        request: Request,
+        call_next: RequestResponseEndpoint,
+    ) -> Response:
         request.state.redis = request.app.state.redis
         response = await call_next(request)
         return response
 
     @api.middleware("http")
-    async def add_process_time_header(request: Request, call_next):
+    async def add_process_time_header(
+        request: Request,
+        call_next: RequestResponseEndpoint,
+    ) -> Response:
         start_time = time.perf_counter_ns()
         response = await call_next(request)
         process_time = (time.perf_counter_ns() - start_time) / 1e6
@@ -94,7 +105,7 @@ def init_routes(api: FastAPI) -> None:
     api.include_router(v1_router)
 
 
-def init_api():
+def init_api() -> FastAPI:
     api = FastAPI()
 
     init_db(api)

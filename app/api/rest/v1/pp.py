@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import Response
 
 from app.api.rest.context import RequestContext
 from app.common import responses
@@ -20,7 +21,7 @@ async def get_profile_pp_history(
     user_id: int,
     mode: int,
     ctx: RequestContext = Depends(),
-):
+) -> Response:
     data = await pp.fetch_many(ctx, user_id, mode)
     user_data = await user.fetch_one(ctx, user_id, mode)
 

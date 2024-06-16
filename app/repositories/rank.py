@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import Any
 
 from app.common.context import Context
@@ -22,7 +21,7 @@ class RanksRepo:
         self,
         user_id: int,
         mode: int,
-    ) -> Mapping[str, Any] | None:
+    ) -> dict[str, Any] | None:
         query = f"""\
             SELECT {self.READ_PEAK_PARAMS} FROM `user_profile_history`
                 WHERE `user_id` = :user_id AND `mode` = :mode AND `rank` > 0
@@ -39,7 +38,7 @@ class RanksRepo:
         user_id: int,
         mode: int,
         limit: int = 89,  # one will be added in api.
-    ) -> list[Mapping[str, Any]]:
+    ) -> list[dict[str, Any]]:
         query = f"""\
             SELECT {self.READ_PARAMS}
               FROM `user_profile_history`

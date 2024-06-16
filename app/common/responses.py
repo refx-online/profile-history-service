@@ -21,7 +21,7 @@ class Success(BaseModel, Generic[T]):
 def success(
     content: Any,
     status_code: int = 200,
-    headers: dict | None = None,
+    headers: dict[str, str] | None = None,
 ) -> json.ORJSONResponse:
     data = {"status": "success", "data": content}
     return json.ORJSONResponse(data, status_code, headers)
@@ -37,7 +37,7 @@ def failure(
     error: ServiceError,
     message: str,
     status_code: int = 400,
-    headers: dict | None = None,
+    headers: dict[str, str] | None = None,
 ) -> json.ORJSONResponse:
     data = {"status": "error", "error": error, "message": message}
     return json.ORJSONResponse(data, status_code, headers)

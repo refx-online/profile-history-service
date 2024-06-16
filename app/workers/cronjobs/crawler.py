@@ -20,6 +20,9 @@ class PartialUser(TypedDict):
     country: str
 
 
+redis: aioredis.Redis
+db: database.Database
+
 redis_map = {
     0: ("leaderboard", "std"),
     1: ("leaderboard", "taiko"),
@@ -32,12 +35,9 @@ redis_map = {
 }
 
 
-async def fetch_rank(
-    user_id: int,
-    mode: int,
-) -> int:
+async def fetch_rank(user_id: int, mode: int) -> int:
     (redis_key, mode_name) = redis_map[mode]
-    current_rank = await redis.zrevrank(f"ripple:{redis_key}:{mode_name}", user_id)
+    current_rank: int = await redis.zrevrank(f"ripple:{redis_key}:{mode_name}", user_id)
 
     if current_rank is None:
         current_rank = 0
@@ -47,13 +47,9 @@ async def fetch_rank(
     return current_rank
 
 
-async def fetch_c_rank(
-    user_id: int,
-    mode: int,
-    country: str,
-) -> int:
+async def fetch_c_rank(user_id: int, mode: int, country: str) -> int:
     (redis_key, mode_name) = redis_map[mode]
-    current_rank = await redis.zrevrank(
+    current_rank: int = await redis.zrevrank(
         f"ripple:{redis_key}:{mode_name}:{country.lower()}",
         user_id,
     )
@@ -74,7 +70,7 @@ async def fetch_pp(
         "user_id": user_id,
         "mode": mode,
     }
-    current_pp = await db.fetch_val(
+    current_pp: int = await db.fetch_val(
         """
         SELECT `pp`
         FROM `user_stats`
@@ -97,7 +93,7 @@ async def gather_profile_history(user: PartialUser) -> None:
     start_time = int(time.time())
 
     for mode in (0, 1, 2, 3, 4, 5, 6, 8):
-        latest_pp_awarded = await db.fetch_val(
+        latest_pp_awarded: int = await db.fetch_val(
             """
             SELECT `latest_pp_awarded`
             FROM `user_stats`
@@ -153,7 +149,7 @@ async def gather_profile_history(user: PartialUser) -> None:
 async def async_main() -> int:
     global redis, db
 
-    redis = await aioredis.from_url(
+    redis = await aioredis.from_url(  # type: ignore[no-untyped-call]
         f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}",
     )
     db = database.Database(
