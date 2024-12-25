@@ -22,7 +22,7 @@ class UsersRepo:
         self,
         user_id: int,
         mode: int,
-    ) -> str | None: # wait is it str or int
+    ) -> int | None:
         params = {
             "user_id": user_id,
             "mode": mode,
@@ -37,7 +37,7 @@ class UsersRepo:
     ) -> dict[str, Any] | None:
         latest_pp_awarded = await self.fetch_latest_pp_awarded(user_id, mode)
 
-        query = f"""\ 
+        query = """\
             SELECT `priv`, `country`
             FROM `users`
             WHERE `id` = :user_id
@@ -45,13 +45,16 @@ class UsersRepo:
         """
         params = {
             "user_id": user_id,
-            "mode": mode,
         }
 
         user_data = await self.ctx.db.fetch_one(query, params)
         # TODO: dont do this?
         # this just a shortcut, i dont want to fuck up bpy again
         if user_data:
-            user_data["latest_pp_awarded"] = latest_pp_awarded
+            user_data["latest_pp_awarded"] = latest_pp_awarded or 0
 
-        return user_data
+        # ????????????????????????????????????????????????????????
+        try:
+            return user_data
+        except:
+            return None
