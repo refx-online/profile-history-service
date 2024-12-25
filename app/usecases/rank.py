@@ -9,17 +9,6 @@ from app.models.rank import RankHistory
 from app.models.rank import RankPeak
 from app.repositories.rank import RanksRepo
 
-mode_map = {
-    0: ("leaderboard", "std"),
-    1: ("leaderboard", "taiko"),
-    2: ("leaderboard", "ctb"),
-    3: ("leaderboard", "mania"),
-    4: ("relaxboard", "std"),
-    5: ("relaxboard", "taiko"),
-    6: ("relaxboard", "ctb"),
-    8: ("autoboard", "std"),
-}
-
 
 async def fetch_peak(
     ctx: Context,
@@ -66,10 +55,9 @@ async def fetch_current(
     mode: int,
     country: str,
 ) -> RankCapture | None:
-    (redis_key, mode_name) = mode_map[mode]
-    current_rank = await ctx.redis.zrevrank(f"ripple:{redis_key}:{mode_name}", user_id)
+    current_rank = await ctx.redis.zrevrank(f"bancho:leaderboard:{mode}", user_id)
     current_c_rank = await ctx.redis.zrevrank(
-        f"ripple:{redis_key}:{mode_name}:{country.lower()}",
+        f"bancho:leaderboard:{mode}:{country.lower()}",
         user_id,
     )
 
@@ -91,8 +79,7 @@ async def fetch_current_rank(
     user_id: int,
     mode: int,
 ) -> RankPeak | None:
-    (redis_key, mode_name) = mode_map[mode]
-    current_rank = await ctx.redis.zrevrank(f"ripple:{redis_key}:{mode_name}", user_id)
+    current_rank = await ctx.redis.zrevrank(f"bancho:leaderboard:{mode}", user_id)
     if current_rank is None:
         return None
 

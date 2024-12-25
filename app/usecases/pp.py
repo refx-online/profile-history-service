@@ -30,14 +30,14 @@ async def fetch_current(
     mode: int,
 ) -> PPCapture | None:
     params = {
-        "user_id": user_id,
+        "id": user_id,
         "mode": mode,
     }
     current_pp = await ctx.db.fetch_val(
         """
         SELECT `pp`
-        FROM `user_stats`
-        WHERE `user_id` = :user_id
+        FROM `stats`
+        WHERE `id` = :id
         AND `mode` = :mode
         """,
         params,

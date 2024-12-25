@@ -23,21 +23,8 @@ class PartialUser(TypedDict):
 redis: aioredis.Redis
 db: database.Database
 
-redis_map = {
-    0: ("leaderboard", "std"),
-    1: ("leaderboard", "taiko"),
-    2: ("leaderboard", "ctb"),
-    3: ("leaderboard", "mania"),
-    4: ("relaxboard", "std"),
-    5: ("relaxboard", "taiko"),
-    6: ("relaxboard", "ctb"),
-    8: ("autoboard", "std"),
-}
-
-
 async def fetch_rank(user_id: int, mode: int) -> int:
-    (redis_key, mode_name) = redis_map[mode]
-    current_rank: int = await redis.zrevrank(f"ripple:{redis_key}:{mode_name}", user_id)
+    current_rank: int = await redis.zrevrank(f"bancho:leaderboard:{mode}", user_id)
 
     if current_rank is None:
         current_rank = 0
@@ -48,9 +35,8 @@ async def fetch_rank(user_id: int, mode: int) -> int:
 
 
 async def fetch_c_rank(user_id: int, mode: int, country: str) -> int:
-    (redis_key, mode_name) = redis_map[mode]
     current_rank: int = await redis.zrevrank(
-        f"ripple:{redis_key}:{mode_name}:{country.lower()}",
+        f"bancho:leaderboard:{mode}:{country.lower()}",
         user_id,
     )
 
@@ -73,8 +59,8 @@ async def fetch_pp(
     current_pp: int = await db.fetch_val(
         """
         SELECT `pp`
-        FROM `user_stats`
-        WHERE `user_id` = :user_id
+        FROM `stats`
+        WHERE `id` = :user_id
         AND `mode` = :mode
         """,
         params,
@@ -88,20 +74,26 @@ async def fetch_pp(
 
 async def gather_profile_history(user: PartialUser) -> None:
     user_id = user["id"]
-    privileges = user["privileges"]
+    privileges = user["priv"]
 
     start_time = int(time.time())
 
-    for mode in (0, 1, 2, 3, 4, 5, 6, 8):
+    for mode in (0, 1, 2, 3, 4, 5, 6, 7):
+        # quick hack
+        # it could be NoneType
         latest_pp_awarded: int = await db.fetch_val(
             """
-            SELECT `latest_pp_awarded`
-            FROM `user_stats`
-            WHERE `user_id` = :user_id
-            AND `mode` = :mode
+            SELECT UNIX_TIMESTAMP(MAX(play_time)) AS `latest_pp_awarded`
+            FROM `scores`
+            WHERE `userid` = :user_id 
+            AND `mode` = :mode 
+            AND `grade` != 'f'
             """,
             {"user_id": user_id, "mode": mode},
         )
+        if latest_pp_awarded is None:
+            latest_pp_awarded = start_time
+
         inactive_days = (start_time - latest_pp_awarded) / 60 / 60 / 24
 
         if inactive_days > 60 or not privileges & 1:
@@ -172,7 +164,7 @@ async def async_main() -> int:
 
     users = await db.fetch_all(
         """
-        SELECT `id`, `privileges`, `country`
+        SELECT `id`, `priv`, `country`
         FROM `users`
         """,
     )
@@ -180,7 +172,7 @@ async def async_main() -> int:
         await gather_profile_history(
             {
                 "id": user["id"],
-                "privileges": user["privileges"],
+                "priv": user["priv"],
                 "country": user["country"],
             },
         )

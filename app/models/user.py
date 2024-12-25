@@ -14,7 +14,7 @@ class UserInfo(BaseModel):
     @classmethod
     def from_mapping(cls, mapping: Mapping[str, Any]) -> UserInfo:
         return cls(
-            privileges=mapping["privileges"],
+            privileges=mapping["priv"],
             country=mapping["country"],
             latest_pp_awarded=mapping["latest_pp_awarded"],
         )

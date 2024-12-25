@@ -11,7 +11,7 @@ spec:
         spec:
           containers:
           - name: profile-history-service-cron-production
-            image: osuakatsuki/profile-history-service:latest
+            image: refx-online/profile-history-service:latest
             imagePullPolicy: Always
             command:
               - ./scripts/bootstrap.sh
@@ -36,7 +36,7 @@ spec:
                 value: crawler-cronjob
           restartPolicy: OnFailure
           imagePullSecrets:
-            - name: osuakatsuki-registry-secret
+            - name: refx-registry-secret
         metadata:
           labels:
             sidecar.istio.io/inject: "false"
